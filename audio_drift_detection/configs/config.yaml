@@ -1,0 +1,62 @@
+# ============================================================
+# Privacy-Preserving Concept Drift Detection — Configuration
+# ============================================================
+
+# --- Dataset ---
+dataset:
+  name: "urbansound8k"
+  data_home: "data/raw_audio"            # soundata download location
+  processed_dir: "data/processed_features"
+  sample_rate: 22050
+  max_duration: 4.0                       # seconds – pad/truncate
+
+# --- Feature Extraction ---
+features:
+  mfcc_features: 13                       # number of MFCCs
+  n_fft: 2048
+  hop_length: 512
+  use_deltas: true                        # append Δ and ΔΔ
+  normalize: true
+
+# --- Teacher Model ---
+teacher:
+  input_dim: null                         # auto-computed from features
+  hidden_dims: [256, 128]
+  embedding_dim: 64
+  epochs: 30
+  learning_rate: 0.001
+  batch_size: 64
+
+# --- Student Models ---
+students:
+  num_students: 5
+  hidden_dims: [256, 128]
+  embedding_dim: 64                       # must match teacher
+  epochs: 20
+  learning_rate: 0.001
+  batch_size: 64
+
+# --- Drift Detection ---
+drift:
+  alpha: 0.7                              # weight for mean reconstruction loss
+  beta: 0.3                               # weight for ensemble variance
+  adwin_delta: 0.002                      # ADWIN sensitivity
+  noise_sigma: 0.0                        # optional Gaussian noise for privacy
+
+# --- Streaming ---
+streaming:
+  window_size: 1                          # samples per step
+  drift_point_ratio: 0.5                  # fraction of stream at which drift occurs
+
+# --- Experiment ---
+experiment:
+  seed: 42
+  output_dir: "outputs"
+  scenarios:
+    - "abrupt"
+    - "gradual"
+    - "noise"
+  ablation_modes:
+    - "studd_only"
+    - "ensemble_only"
+    - "combined"

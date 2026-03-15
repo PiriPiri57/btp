@@ -1,0 +1,3 @@
+# Data directories — populated at runtime
+# raw_audio/   — UrbanSound8K (downloaded by soundata)
+# processed_features/ — cached MFCC features
