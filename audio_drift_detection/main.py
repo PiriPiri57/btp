@@ -31,7 +31,7 @@ from experiments.run_experiments import run_all_experiments
 from experiments.ablation_study import run_ablation
 
 
-def main(config_path: str = "configs/config.yaml") -> None:
+def main(config_path: str = r"C:\Users\Priyanshu.Priyanshu_PC\Desktop\BTP\audio_drift_detection\configs\config.yaml") -> None:
     """Run the complete pipeline end-to-end."""
 
     # ── Configuration ────────────────────────────────────────────────
@@ -47,12 +47,28 @@ def main(config_path: str = "configs/config.yaml") -> None:
     logger.info("Configuration loaded from %s", config_path)
 
     # ── 1. Download / Load UrbanSound8K ───────────────────────────────
+    # ── 1. Download / Load UrbanSound8K ───────────────────────────────
     logger.info("=" * 60)
     logger.info("STEP 1 — Dataset download & loading")
     logger.info("=" * 60)
 
     loader = AudioLoader(data_home=cfg["dataset"]["data_home"])
-    loader.download()
+    dataset_path = Path(cfg["dataset"]["data_home"]) / "UrbanSound8K"
+
+    if not dataset_path.exists():
+        logger.info("Dataset not found. Downloading...")
+        loader.download()
+    else:
+        logger.info("Dataset folder exists. Checking index...")
+
+    try:
+        # This will fail if index is missing
+        _ = loader.dataset.clip_ids
+        logger.info("Index found. Skipping download.")
+    except Exception:
+        logger.info("Index missing. Downloading metadata only...")
+        loader.download()
+
     clips = loader.load_all_clips(
         max_duration=cfg["dataset"]["max_duration"],
         sample_rate=cfg["dataset"]["sample_rate"],
@@ -166,7 +182,13 @@ def main(config_path: str = "configs/config.yaml") -> None:
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Privacy-Preserving Concept Drift Detection")
-    parser.add_argument("--config", default="configs/config.yaml", help="Path to config YAML")
+    parser = argparse.ArgumentParser(
+        description="Privacy-Preserving Concept Drift Detection"
+    )
+
+    default_config = str(Path(__file__).parent / "configs/config.yaml")
+
+    parser.add_argument("--config", default=default_config)
+
     args = parser.parse_args()
     main(args.config)
