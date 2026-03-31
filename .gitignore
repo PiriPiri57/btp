@@ -21,6 +21,14 @@ Thumbs.db
 *.wav
 *.mp3
 *.flac
+*.csv
+*.tsv
+*.pkl
+*.pickle
+*.npy
+*.h5
+*.hdf5
+*.parquet
 
 # Model checkpoints
 *.pt
