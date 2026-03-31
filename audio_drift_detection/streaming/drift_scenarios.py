@@ -120,7 +120,7 @@ def noise_drift(
     features: np.ndarray,
     labels: np.ndarray,
     drift_point_ratio: float = 0.5,
-    noise_scale: float = 2.0,
+    noise_scale: float = 1.0,
     seed: int = 42,
 ) -> tuple[np.ndarray, np.ndarray, int, list[int]]:
     """Create a noise-drift stream.
@@ -131,11 +131,22 @@ def noise_drift(
         ``(stream_features, stream_labels, drift_point, true_drift_indices)``
     """
     rng = np.random.RandomState(seed)
-    n = len(features)
+    
+    unique = sorted(np.unique(labels))
+    mid = len(unique) // 2
+    group_a = unique[:mid]
+    
+    idx_a = np.where(np.isin(labels, group_a))[0]
+    sub_feat = features[idx_a]
+    sub_labels = labels[idx_a]
+    
+    n = len(sub_feat)
     order = rng.permutation(n)
+    
+    stream_feat = sub_feat[order].copy()
+    stream_lbl = sub_labels[order].copy()
 
     drift_point = int(n * drift_point_ratio)
-    stream_feat = features[order].copy()
     stream_feat[drift_point:] += rng.normal(
         0, noise_scale, size=stream_feat[drift_point:].shape
     ).astype(stream_feat.dtype)
@@ -145,7 +156,7 @@ def noise_drift(
     logger.info(
         "Noise drift: noise_scale=%.2f, drift at t=%d", noise_scale, drift_point,
     )
-    return stream_feat, labels[order], drift_point, true_drifts
+    return stream_feat, stream_lbl, drift_point, true_drifts
 
 
 # ------------------------------------------------------------------

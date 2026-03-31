@@ -40,7 +40,7 @@ students:
 drift:
   alpha: 0.7                              # weight for mean reconstruction loss
   beta: 0.3                               # weight for ensemble variance
-  adwin_delta: 0.002                      # ADWIN sensitivity
+  adwin_delta: 0.05                       # ADWIN sensitivity
   noise_sigma: 0.0                        # optional Gaussian noise for privacy
 
 # --- Streaming ---

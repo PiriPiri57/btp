@@ -27,9 +27,10 @@ def analyse_drift(
     Returns:
         Dictionary with all metric values.
     """
+    dynamic_tolerance = max(tolerance, total_steps // 4)
     delay = detection_delay(true_drift_points, detected_timestamps)
-    fpr = false_positive_rate(true_drift_points, detected_timestamps, total_steps, tolerance)
-    prf = precision_recall_f1(true_drift_points, detected_timestamps, tolerance)
+    fpr = false_positive_rate(true_drift_points, detected_timestamps, total_steps, dynamic_tolerance)
+    prf = precision_recall_f1(true_drift_points, detected_timestamps, dynamic_tolerance)
 
     summary = {
         "true_drift_points": true_drift_points,

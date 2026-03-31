@@ -1,12 +1,12 @@
 {
   "true_drift_points": [
-    4366
+    2214
   ],
   "detected_timestamps": [
-    4415
+    2303
   ],
   "num_detections": 1,
-  "detection_delay": 49.0,
+  "detection_delay": 89.0,
   "false_positive_rate": 0.0,
   "precision": 1.0,
   "recall": 1.0,

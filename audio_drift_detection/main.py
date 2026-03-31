@@ -46,46 +46,6 @@ def main(config_path: str = r"C:\Users\Priyanshu.Priyanshu_PC\Desktop\BTP\audio_
     logger.info("Device: %s", device)
     logger.info("Configuration loaded from %s", config_path)
 
-    # ── 1. Download / Load UrbanSound8K ───────────────────────────────
-    logger.info("=" * 60)
-    logger.info("STEP 1 — Dataset download & loading")
-    logger.info("=" * 60)
-
-    loader = AudioLoader(data_home=cfg["dataset"]["data_home"])
-    dataset_path = Path(cfg["dataset"]["data_home"]) / "UrbanSound8K"
-
-    if not dataset_path.exists():
-        logger.info("Dataset not found. Downloading...")
-        loader.download()
-    else:
-        logger.info("Dataset folder exists. Checking index...")
-
-    try:
-        # This will fail if index is missing
-        _ = loader.dataset.clip_ids
-        logger.info("Index found. Skipping download.")
-    except Exception:
-        logger.info("Index missing. Downloading metadata only...")
-        loader.download()
-
-    clips = loader.load_all_clips(
-        max_duration=cfg["dataset"]["max_duration"],
-        sample_rate=cfg["dataset"]["sample_rate"],
-    )
-
-    # ── 2. Feature Extraction (privacy: raw audio deleted) ───────────
-    logger.info("=" * 60)
-    logger.info("STEP 2 — Feature extraction (MFCC + Δ + ΔΔ)")
-    logger.info("=" * 60)
-
-    fe = FeatureExtractor(
-        n_mfcc=cfg["features"]["mfcc_features"],
-        n_fft=cfg["features"]["n_fft"],
-        hop_length=cfg["features"]["hop_length"],
-        use_deltas=cfg["features"]["use_deltas"],
-        normalize=cfg["features"]["normalize"],
-    )
-
     processed_dir = cfg["dataset"]["processed_dir"]
     cache_file = Path(processed_dir) / "features.npz"
 
@@ -93,18 +53,65 @@ def main(config_path: str = r"C:\Users\Priyanshu.Priyanshu_PC\Desktop\BTP\audio_
         logger.info("Loading cached features from %s", cache_file)
         features, labels, label_names = FeatureExtractor.load_cached(cache_file)
     else:
+        # ── 1. Download / Load UrbanSound8K ───────────────────────────────
+        logger.info("=" * 60)
+        logger.info("STEP 1 — Dataset download & loading (cache not found)")
+        logger.info("=" * 60)
+
+        loader = AudioLoader(data_home=cfg["dataset"]["data_home"])
+        dataset_path = Path(cfg["dataset"]["data_home"]) / "UrbanSound8K"
+
+        if not dataset_path.exists():
+            logger.info("Dataset not found. Downloading...")
+            loader.download()
+        else:
+            logger.info("Dataset folder exists. Checking index...")
+
+        try:
+            _ = loader.dataset.clip_ids
+            logger.info("Index found. Skipping download.")
+        except Exception:
+            logger.info("Index missing. Downloading metadata only...")
+            loader.download()
+
+        clips = loader.load_all_clips(
+            max_duration=cfg["dataset"]["max_duration"],
+            sample_rate=cfg["dataset"]["sample_rate"],
+        )
+
+        # ── 2. Feature Extraction (privacy: raw audio deleted) ───────────
+        logger.info("=" * 60)
+        logger.info("STEP 2 — Feature extraction (MFCC + Δ + ΔΔ)")
+        logger.info("=" * 60)
+
+        fe = FeatureExtractor(
+            n_mfcc=cfg["features"]["mfcc_features"],
+            n_fft=cfg["features"]["n_fft"],
+            hop_length=cfg["features"]["hop_length"],
+            use_deltas=cfg["features"]["use_deltas"],
+            normalize=cfg["features"]["normalize"],
+        )
         features, labels, label_names = fe.extract_batch(clips, save_path=processed_dir)
 
     input_dim = features.shape[1]
     logger.info("Feature dim: %d  |  Samples: %d  |  Classes: %d", input_dim, len(features), len(label_names))
 
+    # Split dataset so models ONLY train on "Group A" classes (no drift leakage)
+    unique_classes = sorted(np.unique(labels))
+    mid = len(unique_classes) // 2
+    group_a_classes = unique_classes[:mid]
+    
+    mask_a = np.isin(labels, group_a_classes)
+    train_features = features[mask_a]
+    train_labels = labels[mask_a]
+
     # ── 3. Train Teacher ──────────────────────────────────────────────
     logger.info("=" * 60)
-    logger.info("STEP 3 — Pretrain teacher encoder")
+    logger.info("STEP 3 — Pretrain teacher encoder (on %d normal samples)", len(train_features))
     logger.info("=" * 60)
 
     teacher = train_teacher(
-        features=features,
+        features=train_features,
         input_dim=input_dim,
         hidden_dims=cfg["teacher"]["hidden_dims"],
         embedding_dim=cfg["teacher"]["embedding_dim"],
@@ -130,8 +137,8 @@ def main(config_path: str = r"C:\Users\Priyanshu.Priyanshu_PC\Desktop\BTP\audio_
     train_students(
         ensemble=ensemble,
         teacher=teacher,
-        features=features,
-        labels=labels,
+        features=train_features,
+        labels=train_labels,
         epochs=cfg["students"]["epochs"],
         batch_size=cfg["students"]["batch_size"],
         learning_rate=cfg["students"]["learning_rate"],
