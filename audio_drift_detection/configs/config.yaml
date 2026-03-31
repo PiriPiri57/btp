@@ -5,10 +5,11 @@
 # --- Dataset ---
 dataset:
   name: "urbansound8k"
-  data_home: "C:/Users/Priyanshu.Priyanshu_PC/Desktop/BTP/data/raw_audio"
-  processed_dir: "C:/Users/Priyanshu.Priyanshu_PC/Desktop/BTP/data/processed_features"
+  data_home: "C:/Users/Priyanshu.Priyanshu_PC/Desktop/BTP/btp/audio_drift_detection/data/raw_audio"
+  processed_dir: "C:/Users/Priyanshu.Priyanshu_PC/Desktop/BTP/btp/audio_drift_detection/data/processed_features"
   sample_rate: 22050
   max_duration: 4.0
+
 # --- Feature Extraction ---
 features:
   mfcc_features: 13                       # number of MFCCs

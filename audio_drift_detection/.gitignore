@@ -37,3 +37,9 @@ build/
 
 # Logs
 *.log
+
+data/raw_audio/
+*.tar.gz
+*.npz
+
+audio_drift_detection/data/raw_audio/

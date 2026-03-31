@@ -37,3 +37,8 @@ build/
 
 # Logs
 *.log
+
+data/raw_audio/
+data/processed/
+*.npz
+*.tar.gz

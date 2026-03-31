@@ -1,0 +1,50 @@
+[
+  {
+    "true_drift_points": [
+      4429
+    ],
+    "detected_timestamps": [],
+    "num_detections": 0,
+    "detection_delay": NaN,
+    "false_positive_rate": 0.0,
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1": 0.0,
+    "mode": "studd_only",
+    "alpha": 1.0,
+    "beta": 0.0,
+    "scenario": "abrupt"
+  },
+  {
+    "true_drift_points": [
+      4429
+    ],
+    "detected_timestamps": [],
+    "num_detections": 0,
+    "detection_delay": NaN,
+    "false_positive_rate": 0.0,
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1": 0.0,
+    "mode": "ensemble_only",
+    "alpha": 0.0,
+    "beta": 1.0,
+    "scenario": "abrupt"
+  },
+  {
+    "true_drift_points": [
+      4429
+    ],
+    "detected_timestamps": [],
+    "num_detections": 0,
+    "detection_delay": NaN,
+    "false_positive_rate": 0.0,
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1": 0.0,
+    "mode": "combined",
+    "alpha": 0.7,
+    "beta": 0.3,
+    "scenario": "abrupt"
+  }
+]
