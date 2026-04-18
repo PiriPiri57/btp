@@ -37,7 +37,7 @@ def plot_loss_distributions(
     fig, axes = plt.subplots(1, 2, figsize=(14, 5))
 
     # --- Rolling statistics ---
-    window = min(100, len(scores) // 5) if len(scores) > 5 else 1
+    window = min(5, len(scores) // 5) if len(scores) > 5 else 1
     rolling_mean = np.convolve(scores, np.ones(window) / window, mode="valid")
     rolling_std = np.array(
         [scores[max(0, i - window):i].std() for i in range(window, len(scores) + 1)]

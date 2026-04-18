@@ -34,7 +34,7 @@ from experiments.ablation_study import run_ablation
 def main(config_path: str = r"C:\Users\Priyanshu.Priyanshu_PC\Desktop\BTP\audio_drift_detection\configs\config.yaml") -> None:
     """Run the complete pipeline end-to-end."""
 
-    # ── Configuration ────────────────────────────────────────────────
+    
     cfg = load_config(config_path)
     seed = cfg["experiment"]["seed"]
     set_global_seed(seed)
@@ -184,7 +184,7 @@ def main(config_path: str = r"C:\Users\Priyanshu.Priyanshu_PC\Desktop\BTP\audio_
         ablation_modes=cfg["experiment"]["ablation_modes"],
     )
 
-    logger.info("✅  Pipeline complete. Results saved to %s/", output_dir)
+    logger.info(" Pipeline complete. Results saved to %s/", output_dir)
 
 
 if __name__ == "__main__":

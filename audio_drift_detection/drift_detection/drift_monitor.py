@@ -65,7 +65,7 @@ class DriftMonitor:
             event = DriftEvent(timestamp, drift_score, mean_loss, loss_variance)
             self.drift_events.append(event)
             logger.warning(
-                "⚠️  DRIFT DETECTED at t=%d  (score=%.4f, mean_loss=%.4f, var=%.4f)",
+                "  DRIFT DETECTED at t=%d  (score=%.4f, mean_loss=%.4f, var=%.4f)",
                 timestamp, drift_score, mean_loss, loss_variance,
             )
             return True

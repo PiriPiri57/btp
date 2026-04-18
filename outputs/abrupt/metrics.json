@@ -1,0 +1,15 @@
+{
+  "true_drift_points": [
+    4429
+  ],
+  "detected_timestamps": [
+    5535
+  ],
+  "num_detections": 1,
+  "detection_delay": 1106.0,
+  "false_positive_rate": 0.0,
+  "precision": 1.0,
+  "recall": 1.0,
+  "f1": 1.0,
+  "scenario": "abrupt"
+}
